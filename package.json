@@ -1,0 +1,26 @@
+{
+  "name": "irritating-es6",
+  "version": "1.0.0",
+  "description": "i-hate-doing-config",
+  "main": "index.js",
+  "scripts": {
+    "test": "karma start karma.conf.js",
+    "babel": "babel --presets es2015 js/arraylib.es6.js -o js/arraylib.compiled.js",
+    "babel-test": "babel --presets es2015 test/arraylib.es6.test.js -o test/arraylib.test.compiled.js",
+    "webpack": "webpack"
+  },
+  "author": "maxijuice",
+  "license": "ISC",
+  "devDependencies": {
+    "babel-cli": "^6.24.0",
+    "babel-core": "^6.24.0",
+    "babel-loader": "^6.4.1",
+    "babel-preset-es2015": "^6.24.0",
+    "jasmine-core": "^2.5.2",
+    "karma": "^1.6.0",
+    "karma-chrome-launcher": "^2.0.0",
+    "karma-jasmine": "^1.1.0",
+    "karma-webpack": "^2.0.3",
+    "webpack": "^2.3.3"
+  }
+}
