@@ -1,78 +1,86 @@
 /**
- * Created by maksim.bulakhau on 4/6/2017.
+ * Created by maksim.bulakhau on 3/27/2017.
  */
-var arraylib = (function arrayLibrary() {
-    function take(array, n) {
+/*
+ Array Library object for operating on arrays
+ */
+
+/*
+It would be great to add static keyword, which could be applied on classes
+In ES5 that would look like:
+
+var StaticClass = function() {};
+StaticClass.prototype = Object.create(null);
+StaticClass.method1 = function() { / native code / };
+*/
+"use strict";
+
+export default class ArrayLibrary {
+
+    static take(array, n) {
         return array.slice(0, n);
     }
 
-    function skip(array, n) {
+    static skip(array, n) {
         return array.slice(n);
     }
 
-    function map(array, callback) {
-        let length = array.length;
+    static map(array, callback) {
         let newArray = [];
 
-        for (let k = 0; k < length; k++) {
-            newArray.push(callback(array[k]));
+        for (let item of array) {
+            if (typeof item !== "undefined") {
+                newArray.push(callback(item));
+            }
         }
 
         return newArray;
     }
 
-    function reduce(array, callback /*, initialValue*/) {
-        let k = 0;
+    static reduce(array, callback, ...args) {
         let value = 0;
 
-        if (arguments.length >= 3) {
-            value = arguments[2];
+        if (args.length > 0) {
+            value = args[0];
         } else {
-            value = array[k];
-            k++;
+            value = array[0];
+            array = array.slice(1);
         }
 
-        let length = array.length;
-
-        for (; k < length; k++){
-            if (k in array){
-                value = callback(value, array[k]);
+        for (let item of array){
+            if (typeof item !== "undefined") {
+                value = callback(value, item);
             }
         }
 
         return value;
     }
 
-    function foreach(array, callback) {
-        let length = array.length;
-
-        for (let i = 0; i < length; i++) {
-            if (i in array) {
-                callback(array[i], i, array);
+    static foreach(array, callback) {
+        for (let item of array) {
+            if (typeof item !== "undefined") {
+                callback(item, array.indexOf(item), array);
             }
         }
     }
 
-    function filter(array, callback) {
+    static filter(array, callback) {
         let newArray = [];
-        let length = array.length;
 
-        for (let i = 0; i < length; i++) {
-            if (i in array) {
-                if (callback(array[i], i, array)) {
-                    newArray.push(array[i]);
-                }
+        for (let item of array) {
+            if (callback(item, array.indexOf(item), array)) {
+                newArray.push(item);
             }
         }
 
         return newArray;
     }
 
-    function chain(initArray) {
+    static chain(initArray) {
 
         var wrapChain = callback => {
             callback = callback.bind(null, initArray);
-            return (n) => { chain(callback.apply(null, arguments)) }
+            return (...args) => this.chain(callback.apply(null, args));
         }
 
         return {
@@ -81,21 +89,23 @@ var arraylib = (function arrayLibrary() {
             map: wrapChain(this.map),
             foreach: wrapChain(this.foreach),
             filter: wrapChain(this.filter),
-            value: () => { initArray }
+            value: () => initArray
         };
     }
 
-    var sum = (function () {
-        let memo = {};
+    static sum(array, start, end) {
+        if (!this.memo){
+            this.memo = {};
+        }
 
-        function summarize(array, start, end) {
-            let property = array + ", " + start + ", " + end;
+        function summarize(array, start, end, memo) {
+            var property = array + ", " + start + ", " + end;
 
             if (property in memo) {
                 return memo[property];
             } else {
-                let resultSum = 0;
-                for(let i = start; i <= end; i++) {
+                var resultSum = 0;
+                for(var i = start; i <= end; i++) {
                     resultSum += array[i];
                 }
                 memo[property] = resultSum;
@@ -103,10 +113,6 @@ var arraylib = (function arrayLibrary() {
             }
         }
 
-        return summarize;
-    })();
-
-    return { take, skip, map, reduce, foreach, filter, chain, sum };
-})();
-
-export { arraylib };
+        return summarize(array, start, end, this.memo);
+    }
+}
